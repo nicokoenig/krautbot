@@ -1,10 +1,9 @@
 {
   "name": "krautbot",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "kraut bot",
   "main": "index.js",
-  "scripts": {
-  },
+  "scripts": {},
   "keywords": [],
   "author": "Nico Koenig <krautipsum@gmail.com>",
   "license": "ISC",
