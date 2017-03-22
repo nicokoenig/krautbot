@@ -44,27 +44,48 @@ class KrautBot {
     }
   }
 
-  initDailyTweetScheduler() {
-    this.dailyTweetSchedule = later.parse.recur().on('13:37').hour();
+  initDailyTweetSchedulers() {
 
-    this.dailyTweetTimer = later.setInterval(() => {
-      const dailyKrautTweet = kraut.ipsum.makeSentence();
+    this.morningTweetSchedule = later.parse.cron('6 7 * * *');
+    this.morningTweetTimer = later.setInterval(() => {
+      this.postDailyTweet('#earlykraut')
+    }, this.morningTweetSchedule);
+
+    this.lunchTweetSchedule = later.parse.cron('37 14 * * *');
+    this.lunchTweetTimer = later.setInterval(() => {
+      this.postDailyTweet('#lunchkraut')
+    }, this.lunchTweetSchedule);
+
+    this.bedtimeTweetSchedule = later.parse.cron('21 22 * * *');
+    this.bedtimeTweetTimer = later.setInterval(() => {
+      this.postDailyTweet('#bedkraut')
+    }, this.bedtimeTweetSchedule);
+
+    console.log('--> initialized daily tweet schedulers');
+  }
+
+  postDailyTweet(hashTag) {
+
+      let dailyKrautTweet = kraut.ipsum.makeSentence();
+      if(hashTag) {
+        dailyKrautTweet = `${dailyKrautTweet} ${hashTag}`;
+      }
+
       this.twit.post('statuses/update', { status: dailyKrautTweet }, () => {
         console.log(`--> posted daily kraut: ${dailyKrautTweet}`);
       });
-    }, this.dailyTweetSchedule);
-
-    console.log('--> initialized daily tweet scheduler');
   }
 
   initStreams() {
     this.userStream = this.twit.stream('user');
 
-    this.userStream.on('follow', (followEvent) => {
-      const newFollowerTweet = `${kraut.greetings.random()} @${followEvent.source.screen_name}`;
-      this.twit.post('statuses/update', { status: newFollowerTweet }, () => {
-        console.log(`--> posted welcome tweet: ${newFollowerTweet}`);
-      });
+      this.userStream.on('follow', (followEvent) => {
+        if(followEvent.source.screen_name !== OWN_TWITTER_NAME) {
+          const newFollowerTweet = `${kraut.greetings.random()} @${followEvent.source.screen_name}`;
+          this.twit.post('statuses/update', { status: newFollowerTweet }, () => {
+            console.log(`--> posted welcome tweet: ${newFollowerTweet}`);
+        });
+      }
     });
 
     this.userStream.on('tweet', (tweetEvent) => {
@@ -77,11 +98,11 @@ class KrautBot {
     });
 
     this.userStream.on('disconnect', function (disconnectMessage) {
-      console.log(`ON DISCONNECTED: ${disconnectMessage}`);
+      console.log(`--> disconnect: ${disconnectMessage}`);
     });
 
     this.userStream.on('warning', function (warning) {
-      console.log(`ON WARNING: ${warning}`);
+      console.log(`--> warning: ${warning}`);
     });
 
     console.log('--> initialized user streams');
@@ -89,7 +110,7 @@ class KrautBot {
 
   start() {
     if(this.initTwit()) {
-      this.initDailyTweetScheduler();
+      this.initDailyTweetSchedulers();
       this.initStreams();
       console.log('--> started kraut bot');
     }
