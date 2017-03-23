@@ -46,17 +46,17 @@ class KrautBot {
 
   initDailyTweetSchedulers() {
 
-    this.morningTweetSchedule = later.parse.cron('6 7 * * *');
+    this.morningTweetSchedule = later.parse.cron('6 5 * * *');
     this.morningTweetTimer = later.setInterval(() => {
       this.postDailyTweet('#earlykraut')
     }, this.morningTweetSchedule);
 
-    this.lunchTweetSchedule = later.parse.cron('37 14 * * *');
+    this.lunchTweetSchedule = later.parse.cron('37 12 * * *');
     this.lunchTweetTimer = later.setInterval(() => {
       this.postDailyTweet('#lunchkraut')
     }, this.lunchTweetSchedule);
 
-    this.bedtimeTweetSchedule = later.parse.cron('21 22 * * *');
+    this.bedtimeTweetSchedule = later.parse.cron('21 20 * * *');
     this.bedtimeTweetTimer = later.setInterval(() => {
       this.postDailyTweet('#bedkraut')
     }, this.bedtimeTweetSchedule);
